@@ -59,19 +59,6 @@ def rename_nodes(model_def, new_layers):
     
     return model_def
 
-def net_to_dict(model_def_path, model_weights_path):
-    net = caffe.Net(model_def_path, model_weights_path, caffe.TEST)
-    layers = net.params.items()
-    net_dict = {}
-    
-    for name, params in layers:
-        net_dict[name] = {
-            'weights': params[0].data, 
-            'bias': params[1].data,
-    }
-    
-    return net_dict
-
 def estimate_ranks(weights):
     T0 = np.reshape(np.moveaxis(weights, 0, 0), (weights.shape[0], -1))
     T1 = np.reshape(np.moveaxis(weights, 1, 0), (weights.shape[1], -1))

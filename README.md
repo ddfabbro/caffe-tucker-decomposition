@@ -29,7 +29,7 @@ Example of how these are used can be found in `cnn_tucker_example.py`.
 
 ## Fast getting started example: Tucker decomposition of VGG-16
 
-You can easily get started with Tucker decomposition of a Caffe Net by following these 3 steps:
+You can easily get started with Tucker decomposition of layers **conv4_1**, **conv4_2** and **conv4_3** of VGG-16 by following these 3 steps:
 
 1. Clone respository
 

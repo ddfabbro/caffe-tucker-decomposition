@@ -4,11 +4,12 @@ import caffe
 from collections import OrderedDict
 import cnn_tucker as tucker
 
-ROOT_DIR = '/home/davi/misc_python/caffe-tucker-decomposition/'
+ROOT_DIR = os.path.dirname(os.path.realpath(__file__))
 os.chdir(ROOT_DIR)
 
 if not os.path.isfile('models/VGG_ILSVRC_16_layers_deploy.caffemodel'):
     caffemodel_url = 'http://www.robots.ox.ac.uk/~vgg/software/very_deep/caffe/VGG_ILSVRC_16_layers.caffemodel'
+    print("Downloading VGG_ILSVRC_16_layers_deploy.caffemodel...")
     urllib.urlretrieve (caffemodel_url, 'models/VGG_ILSVRC_16_layers_deploy.caffemodel')
 
 model = {
@@ -32,3 +33,5 @@ layer_ranks = OrderedDict([
 ])
 
 paths = tucker.decompose_model(model['def'], model['weights'], layer_ranks)
+
+print("\nDecomposed models saved to %s" %os.path.join(ROOT_DIR,os.path.dirname(paths[0])))

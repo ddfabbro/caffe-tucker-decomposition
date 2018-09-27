@@ -1,5 +1,5 @@
 # caffe-tucker-decomposition
-Caffe implementation of Tucker tensor decomposition for convolutional layers. Based on [Compression of Deep Convolutional Neural Networks for Fast and Low Power Mobile Applications](https://arxiv.org/abs/1511.06530).
+Caffe implementation of Tucker tensor decomposition for convolutional layers, as described on [Compression of Deep Convolutional Neural Networks for Fast and Low Power Mobile Applications](https://arxiv.org/abs/1511.06530).
 
 For Caffe implementation of CP tensor decomposition for convolutional layers, refer to [caffe-cp-decomposition](https://github.com/ddfabbro/cnn-cpd).
 

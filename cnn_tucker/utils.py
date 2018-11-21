@@ -38,14 +38,20 @@ def rename_nodes(model_def, new_layers):
         if model_def.layer[i].name in new_layers:
             if i == 0:
                 model_def.layer[i].bottom.extend(['data'])
-            elif model_def.layer[i-1].type == 'ReLU':
+            elif model_def.layer[i-1].type in ['ReLU']:
                 model_def.layer[i].bottom.extend([model_def.layer[i-2].name])
             elif model_def.layer[i-1].type in ['Convolution','Pooling']:
                 model_def.layer[i].bottom.extend([model_def.layer[i-1].name])
+            elif model_def.layer[i-1].type in ['Data', 'HDF5Data', 'ImageData']:
+                model_def.layer[i].bottom.extend([model_def.layer[i-1].top[0]])
             model_def.layer[i].top.extend([model_def.layer[i].name])
         #Rename Convolution layers nodes
         elif model_def.layer[i].type == 'Convolution':
-            if model_def.layer[i-2].name in new_layers:
+            if i == 0:
+                model_def.layer[i].bottom[0] = 'data'
+            elif model_def.layer[i-1].name in new_layers: #no ReLU after Conv
+                model_def.layer[i].bottom[0] = model_def.layer[i-1].name
+            elif model_def.layer[i-2].name in new_layers:
                 model_def.layer[i].bottom[0] = model_def.layer[i-2].name
         #Rename ReLU layers nodes
         elif model_def.layer[i].type == 'ReLU':
@@ -54,9 +60,11 @@ def rename_nodes(model_def, new_layers):
                 model_def.layer[i].top[0] = model_def.layer[i-1].name
         #Rename Pooling layers nodes
         elif model_def.layer[i].type == 'Pooling':
-            if model_def.layer[i-2].name in new_layers:
+            if model_def.layer[i-1].name in new_layers: #no ReLU after Conv
+                model_def.layer[i].bottom[0] = model_def.layer[i-1].name
+            elif model_def.layer[i-2].name in new_layers:
                 model_def.layer[i].bottom[0] = model_def.layer[i-2].name
-    
+            
     return model_def
 
 def estimate_ranks(weights):
@@ -64,4 +72,5 @@ def estimate_ranks(weights):
     T1 = np.reshape(np.moveaxis(weights, 1, 0), (weights.shape[1], -1))
     _, T0_rank, _, _ = EVBMF(T0)
     _, T1_rank, _, _ = EVBMF(T1)
+    
     return [T0_rank.shape[0], T1_rank.shape[1]]

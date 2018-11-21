@@ -2,7 +2,7 @@ import numpy as np
 from sktensor import dtensor, tucker
 from sktensor.core import ttm
 import google.protobuf.text_format
-from utils import caffe, decompose_layer, rename_nodes
+from cnn_tucker.utils import caffe, decompose_layer, rename_nodes
 
 def decompose_model(model_def_path, model_weights_path, layer_ranks):
     
@@ -21,14 +21,14 @@ def decompose_model(model_def_path, model_weights_path, layer_ranks):
         
     new_layers = [] #Keeping track of new layers helps renaming nodes in the future
     
-    for layer in model_def.layer:
+    for i, layer in enumerate(model_def.layer):
         if layer.name not in layer_ranks.keys() or layer.type != 'Convolution':
             new_model_def.layer.extend([layer])
         else:
-            decomposed_layer = decompose_layer(layer, layer_ranks[layer.name])
+            decomposed_layers = decompose_layer(layer, layer_ranks[layer.name])
             for i in range(3):
-                new_layers.append(decomposed_layer[i].name)
-            new_model_def.layer.extend(decomposed_layer)
+                new_layers.append(decomposed_layers[i].name)
+            new_model_def.layer.extend(decomposed_layers)
             
     #Rename bottom/top nodes for some layers !!!
     new_model_def = rename_nodes(new_model_def, new_layers)
@@ -48,7 +48,7 @@ def decompose_model(model_def_path, model_weights_path, layer_ranks):
         T = dtensor(weights)
         rank = layer_ranks[conv_layer] + [T.shape[2], T.shape[3]]
         
-        print('\nDecomposing %s...' %conv_layer)
+        print('Decomposing %s...' %conv_layer)
         core, U = tucker.hooi(T, rank, init='nvecs')
 
         num_output = net.params[conv_layer][0].data.shape[0]
@@ -66,5 +66,9 @@ def decompose_model(model_def_path, model_weights_path, layer_ranks):
         
     new_model_weights_path = model_weights_path[:-11] + '_decomposed.caffemodel'
     new_net.save(new_model_weights_path)
+    
+    print('\nDecomposed model definition saved to %s' %new_model_def_path)
+    print('\nDecomposed model weights saved to %s' %new_model_weights_path)
+    print('\nPlease fine-tune')
     
     return new_model_def_path, new_model_weights_path

@@ -11,7 +11,7 @@ For PyTorch implementation of both CP and Tucker decomposition, refer to [PyTorc
     - `numpy`
     - `scipy`
     - `protobuf`
-- `scikit-tensor`
+- `scikit-tensor` (Does not support Python 3)
 
 ## Usage
 
